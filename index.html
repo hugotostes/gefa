@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -741,12 +741,14 @@
       </div>
       <div class="fade-in">
         <h3 style="font-family:'Cormorant Garamond',serif;color:var(--navy);font-size:1.4rem;margin-bottom:1.5rem">Envie uma mensagem</h3>
-        <div class="contato-form">
-          <input type="text" placeholder="Seu nome">
-          <input type="email" placeholder="Seu e-mail">
-          <input type="tel" placeholder="WhatsApp">
-          <input type="email" placeholder="Ou envie para: contato.gefabarra@gmail.com" readonly style="background:#f5f5f0;color:#888;cursor:default">
-          <select>
+        <form class="contato-form" id="contato-form" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="d296e2ea-adff-4d0e-8604-79259beaad9e">
+          <input type="hidden" name="subject" value="Novo contato pelo site - GEFA">
+          <input type="hidden" name="from_name" value="Site GEFA Barra">
+          <input type="text" name="nome" placeholder="Seu nome" required>
+          <input type="email" name="email" placeholder="Seu e-mail" required>
+          <input type="tel" name="whatsapp" placeholder="WhatsApp">
+          <select name="motivo" required>
             <option value="" disabled selected>Motivo do contato</option>
             <option>Quero ser voluntário</option>
             <option>Quero fazer uma doação (PIX)</option>
@@ -756,9 +758,37 @@
             <option>Informações sobre as atividades</option>
             <option>Outro</option>
           </select>
-          <textarea placeholder="Sua mensagem..."></textarea>
-          <button class="btn-warm" onclick="alert('Mensagem enviada! Em breve entraremos em contato. Obrigado pelo interesse em nossa obra! 🙏')">Enviar mensagem</button>
-        </div>
+          <textarea name="mensagem" placeholder="Sua mensagem..." required></textarea>
+          <button type="submit" class="btn-warm" id="btn-enviar">Enviar mensagem</button>
+          <p id="form-status" style="display:none;text-align:center;font-family:'EB Garamond',serif;font-size:1.05rem;padding:0.5rem 0"></p>
+        </form>
+        <script>
+          document.getElementById('contato-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var btn = document.getElementById('btn-enviar');
+            var status = document.getElementById('form-status');
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            try {
+              var resp = await fetch(this.action, { method: 'POST', body: new FormData(this), headers: { 'Accept': 'application/json' } });
+              if (resp.ok) {
+                this.reset();
+                status.style.display = 'block';
+                status.style.color = '#2e7d32';
+                status.textContent = 'Mensagem enviada com sucesso! Em breve entraremos em contato. 🙏';
+                btn.textContent = 'Enviado!';
+              } else {
+                throw new Error();
+              }
+            } catch(_) {
+              status.style.display = 'block';
+              status.style.color = '#c62828';
+              status.textContent = 'Erro ao enviar. Por favor, tente novamente ou envie diretamente para contato.gefabarra@gmail.com';
+              btn.disabled = false;
+              btn.textContent = 'Enviar mensagem';
+            }
+          });
+        </script>
       </div>
     </div>
   </div>
